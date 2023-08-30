@@ -30,13 +30,11 @@ config()
 
 const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY!;
 
-console.log("NEXT_PUBLIC_ALCHEMY_KEY", alchemyKey)
-
 const { chains, publicClient } = configureChains(
   [goerli],
   [
-    publicProvider(),
     alchemyProvider({apiKey: alchemyKey}),
+    publicProvider(),
   ]
 );
 

@@ -24,12 +24,6 @@ const About: NextPage = () => {
           <Heading>
               About Page
           </Heading>
-
-          <Text>
-              With this boilerplate, you get a 👉mobile friendly👈 DApp, a few example pages, a scalable header,
-              the wallet connection + one example transaction done for you🤌.
-          </Text>
-
       </Flex>
     </Flex>
   )

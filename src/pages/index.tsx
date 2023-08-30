@@ -3,7 +3,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import {useAccount, useWalletClient} from "wagmi"
-import {useSmartWallet} from "../utils/ERC4337"
+import {useSmartWallet} from "../hooks/useSmartWallet"
 
 const Home: NextPage = () => {
 
@@ -19,7 +19,7 @@ const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
-        <title>DApp Boilerplate</title>
+        <title>AA For Lyra</title>
         <meta name="description" content="ETH + Next.js DApp Boilerplate by ilyxium" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

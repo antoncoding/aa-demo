@@ -2,12 +2,9 @@ import { useState } from "react";
 import { BigNumber, ethers } from "ethers";
 import { Client, Presets, BundlerJsonRpcProvider, IUserOperationMiddlewareCtx } from "userop";
 import usdcAbi from "../abi/usdc.json";
-
+import { getEthersSigner } from '../utils/common'
 import { config } from "dotenv"
 
-import { type WalletClient, getWalletClient } from '@wagmi/core'
-import { Signer, Wallet, providers } from 'ethers'
- 
 config()
 
 const entryPoint = "0x33a07c35557De1e916B26a049e1165D47d462f6B";
@@ -33,26 +30,8 @@ const paymasterMiddleware: (context: IUserOperationMiddlewareCtx) => Promise<voi
   context.op.callGasLimit = BigNumber.from(context.op.callGasLimit).add(BigNumber.from(1000000));
 }
 
+
 export function useSmartWallet () {
-
-  function walletClientToSigner(walletClient: WalletClient) {
-    const { account, chain, transport } = walletClient
-    const network = {
-      chainId: chain.id,
-      name: chain.name,
-      ensAddress: chain.contracts?.ensRegistry?.address,
-    }
-    const provider = new providers.Web3Provider(transport, network)
-    const signer = provider.getSigner(account.address) as Signer
-    return signer
-  }
- 
-  /** Action to convert a viem Wallet Client to an ethers.js Signer. */
-  async function getEthersSigner({ chainId }: { chainId?: number } = {}) {
-    const walletClient = await getWalletClient({ chainId })
-    return walletClientToSigner(walletClient!)
-  }
-
   async function sendERC20(transferAmount: string) {
     const signer = await getEthersSigner({chainId: 5})
     // simpleAccount preset

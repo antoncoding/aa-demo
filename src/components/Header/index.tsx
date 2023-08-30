@@ -32,19 +32,7 @@ export const Header = () => {
       text: 'home',
       href: '/'
     },
-    {
-      text: 'about',
-      href: '/about',
-      icon: <InformationCircleIcon className="h-6 w-6" />
-    },
-    {
-      text: '404 page',
-      href: '/error',
-      icon: <InformationCircleIcon className="h-6 w-6" />
-    }
   ]
-
-
 
   return (
     <header>
@@ -55,12 +43,6 @@ export const Header = () => {
           px={{ base: 0, lg: '2rem' }}
         >
           <Box fontWeight="bold" fontSize={[20, 20, 20]}>
-            <NextLink href="/" passHref>
-              <Link className="center flex gap-2">
-                <span>👽</span>
-                <span className="text-xl">ilyxium</span>
-              </Link>
-            </NextLink>
           </Box>
 
           <HStack>
