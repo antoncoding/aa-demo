@@ -10,42 +10,49 @@ import {
 } from '@rainbow-me/rainbowkit';
 
 import {
-  chain,
   configureChains,
-  createClient,
+  createConfig,
   WagmiConfig,
 } from 'wagmi';
 
+import { goerli } from 'viem/chains';
+
 import { alchemyProvider } from 'wagmi/providers/alchemy';
-import { publicProvider } from 'wagmi/providers/public';
 import { Page } from '../components/Page'
 import { theme } from '../styles/theme'
+import { connectorsForWallets } from '@rainbow-me/rainbowkit'
+import { injectedWallet, metaMaskWallet } from '@rainbow-me/rainbowkit/wallets'
+import { publicProvider } from 'wagmi/providers/public'
+
+
+import {config} from "dotenv"
+config()
+
+const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY!;
+
+console.log("NEXT_PUBLIC_ALCHEMY_KEY", alchemyKey)
+
+const { chains, publicClient } = configureChains(
+  [goerli],
+  [
+    publicProvider(),
+    alchemyProvider({apiKey: alchemyKey}),
+  ]
+);
+
+const wagmiConfig = createConfig({
+  autoConnect: true,
+  connectors: connectorsForWallets([{
+    groupName: 'Recommended',
+    wallets: [metaMaskWallet({ chains, projectId: 'Lyra' }), injectedWallet({ chains })],
+  }]),
+  publicClient
+})
 
 function MyApp({ Component, pageProps }: AppProps) {
 
-  //This is currently using the public alchemy ID. Please add your own to avoid being rate limited
-  //Docs can be found here: https://wagmi.sh/docs/providers/alchemy
-  const { chains, provider } = configureChains(
-    [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
-    [
-      alchemyProvider(),
-      publicProvider()
-    ]
-  );
-  
-  const { connectors } = getDefaultWallets({
-    appName: 'Eth Next.js Boilerplate',
-    chains
-  });
-
-  const wagmiClient = createClient({
-    autoConnect: true,
-    connectors,
-    provider
-  })
-
   return (
-    <WagmiConfig client={wagmiClient}>
+    <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={chains}>
         <ChakraProvider theme={theme}>
           <Page>

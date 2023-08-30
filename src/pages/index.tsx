@@ -1,19 +1,20 @@
-import { Button, Link } from '@chakra-ui/react'
+import { Button } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import { useSendTransaction } from 'wagmi'
-import { BigNumber } from '@ethersproject/bignumber'
+import {useAccount, useWalletClient} from "wagmi"
+import {useSmartWallet} from "../utils/ERC4337"
 
 const Home: NextPage = () => {
 
-  const { data, isIdle, isError, isLoading, isSuccess, sendTransaction } =
-    useSendTransaction({
-      request: {
-        to: 'yanniksood.eth',
-        value: BigNumber.from('10000000000000000'), // .1 ETH
-      },
-    })
+  const {address} = useAccount()
+  console.log('addr', address)
+
+  const { sendERC20 } = useSmartWallet()
+
+  const handleClick = async () => {
+    await sendERC20('5000000')
+  }
 
   return (
     <div className={styles.container}>
@@ -29,22 +30,6 @@ const Home: NextPage = () => {
         </h2>
 
         <div className={styles.grid}>
-          <Link href='https://twitter.com/yanniksood' isExternal>
-            <Button
-              backgroundColor="#BB86FC"
-              borderRadius="25px"
-              margin={2.5}
-              _hover={{
-                bg: '#121212'
-              }}
-              _active={{
-                bg: '#121212'
-              }}
-            >
-              <p>Follow me on twitter</p>
-            </Button>
-          </Link>
-          
 
           <Button
               backgroundColor="#32CD32"
@@ -56,9 +41,9 @@ const Home: NextPage = () => {
               _active={{
                 bg: '#121212'
               }}
-              onClick={() => sendTransaction()}
+              onClick={() => handleClick()}
             >
-              <p>Donate some ETH</p>
+              <p>Send ETH Tx</p>
             </Button>
         </div>
       </main>

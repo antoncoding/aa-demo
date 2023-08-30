@@ -11,7 +11,6 @@ import {
   Button,
   Link
 } from '@chakra-ui/react'
-import Davatar from '@davatar/react'
 import {
   InformationCircleIcon,
   LoginIcon,
@@ -123,13 +122,7 @@ export const Header = () => {
               marginBottom="3rem"
               fontSize={[20, 20, 20]}
             >
-              
-              <NextLink href="/">
-                <Link className="center flex gap-2">
-                  <span>👽</span>
-                  <span className="text-xl">ilyxium</span>
-                </Link>
-              </NextLink>
+            
 
               {/* Wallet and Close Button Wrapper */}
               <Flex gap="0.5rem">
