@@ -115,29 +115,42 @@ export function useSmartWallet() {
   }, [walletClient])
 
   
-  async function sendERC20(transferAmount: string) {
+  async function sendERC20(transferAmount: string, sendToBundlerCallback?: Function, txConfirmedCallback?: Function) {
 
-    // get the connected wallet (signer)
-    if (provider === undefined) return
-    
-
-    // 2. build transaction: random send usdc tx
+    // 1. build erc20 transactions
     const target = stagingUSDC; // usdc address
     const data = usdcContract.interface.encodeFunctionData("transfer(address,uint256)", [
       '0x7c54F6e650e5AA71112Bfd293b8092717953aF28', // recipient
       transferAmount,
     ]) as `0x${string}`
 
-    // 3. send a UserOperation
+    // 2. send userOp to bundler 
+    await buildAndSendUserOp(target, data, sendToBundlerCallback, txConfirmedCallback)
+
+    // temp: update balance
+    const balance = await usdcContract.balanceOf(smartAccountAddress)
+    setUSDCBalance(ethers.utils.formatUnits(balance, 'mwei')); // 6 decimals
+  }
+
+  async function buildAndSendUserOp(
+    target: `0x${string}`, 
+    data: `0x${string}`, 
+    sendToBundlerCallback?: Function, 
+    txConfirmedCallback?: Function
+  ) {
+    
+    if (provider === undefined) return    
+
+    // send to the bundler
     const { hash } = await provider
       .withPaymasterMiddleware({
-        dummyPaymasterDataMiddleware: async () => {return {paymasterAndData: dumbPaymaster}},
-        paymasterDataMiddleware: async () => {return {paymasterAndData: dumbPaymaster}},
+        dummyPaymasterDataMiddleware: async () => {return {paymasterAndData: dumbPaymaster}}, // this is for verification
+        paymasterDataMiddleware: async () => {return {paymasterAndData: dumbPaymaster}}, // for real tx
       })
       .withCustomMiddleware(async(userOps) => {
         return {
           ...userOps,
-          verificationGasLimit: BigNumber.from(userOps.verificationGasLimit as bigint).mul(2).toString(), // first time wallet
+          verificationGasLimit: BigNumber.from(userOps.verificationGasLimit as bigint).mul(2).toString(), // buffer for first time wallet
         }
       })
       .sendUserOperation({
@@ -146,18 +159,16 @@ export function useSmartWallet() {
       value: BigInt(0),
     }, {
       paymasterAndData: dumbPaymaster, 
-     });
+    });
 
     console.log(`UserOpHash: ${hash}`);
     setOpHash(hash)
+    if (sendToBundlerCallback) sendToBundlerCallback(hash)
 
     const result = await provider.waitForUserOperationTransaction(hash as `0x${string}`)
     console.log("tx Hash", result)
     setTxHash(result)
-
-    // temp: update balance
-    const balance = await usdcContract.balanceOf(smartAccountAddress)
-    setUSDCBalance(ethers.utils.formatUnits(balance, 'mwei')); // 6 decimals
+    if (txConfirmedCallback) txConfirmedCallback(result)
   }
 
   return { sendERC20, walletReady, provider, smartAccountAddress, usdcBalance, opHash, txHash }

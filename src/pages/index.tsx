@@ -4,16 +4,20 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import {useSmartWallet} from "../hooks/useSmartWallet"
 import { useNetwork } from 'wagmi'
+import { useToast } from '@chakra-ui/react'
+
 
 
 const Home: NextPage = () => {
 
-  const {chain} = useNetwork()
+  const toast = useToast();
 
   const { sendERC20, walletReady, smartAccountAddress, usdcBalance, txHash } = useSmartWallet()
 
   const handleClick = async () => {
-    await sendERC20('5000000')
+    await sendERC20('5000000', 
+    () => toast({title:'Tx Sent To bundler'}), 
+    () => toast({title:'Tx confirmed'}))
   }
 
   return (
@@ -51,7 +55,7 @@ const Home: NextPage = () => {
               disabled={!walletReady}
               onClick={() => handleClick()}
             >
-              <p>Send ERC20</p>
+              <p>Send 5 USDC</p>
             </Button>
         </div>
 
