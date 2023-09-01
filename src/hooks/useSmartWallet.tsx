@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
-import { BigNumber, BigNumberish, Wallet, ethers, providers } from "ethers";
+import { BigNumber, Wallet, ethers, providers } from "ethers";
 import usdcAbi from "../abi/usdc.json";
 import { walletClientToSigner } from '../utils/common'
-import { config } from "dotenv"
 import {
   convertEthersSignerToAccountSigner,
 } from "@alchemy/aa-ethers";
@@ -16,17 +15,29 @@ import {getWalletClient, type WalletClient} from "@wagmi/core"
 
 import { Chain } from "viem";
 import { useAccount, useNetwork } from "wagmi";
+import { config } from "dotenv"
 
 config()
 
-const entryPoint = "0x33a07c35557De1e916B26a049e1165D47d462f6B";
-const simpleAccountFactory = "0x7E072a60c7297bD9d027B2a43cD0C27559aF2f58"
-const dumbPaymaster = "0xd198a6f2B3D07a03161FAB8006502e911e5c548e";
-const stagingUSDC = "0xAeE02dB1c65ce17211252f7eba0CDCcA07E95548"
+// switching between staging / testnet prod
+const staging = {
+  entryPoint: "0x33a07c35557De1e916B26a049e1165D47d462f6B" as `0x${string}`,
+  simpleAccountFactory: "0x7E072a60c7297bD9d027B2a43cD0C27559aF2f58" as `0x${string}`,
+  dumbPaymaster: "0xd198a6f2B3D07a03161FAB8006502e911e5c548e" as `0x${string}`,
+  usdc: "0xAeE02dB1c65ce17211252f7eba0CDCcA07E95548" as `0x${string}`,
+}
+
+const testnet = {
+  entryPoint: "0xC25Dc675669907Aee390C0144eA8bB3DFd33a4c7" as `0x${string}`,
+  simpleAccountFactory: "0xBe47826B27dEF857F1d3ED203516Ededbb5c335a" as `0x${string}`,
+  dumbPaymaster: "0xAeE02dB1c65ce17211252f7eba0CDCcA07E95548" as `0x${string}`,
+  usdc:"0xe80F2a02398BBf1ab2C9cc52caD1978159c215BD" as `0x${string}`,
+}
+
+const addresses = testnet;
 
 const bundlerUrl = process.env.NEXT_PUBLIC_BUNDLER_URL!
-
-const rpcUrl = process.env.NEXT_PUBLIC_L2_RPC!; // Lyra staging (important?)
+const rpcUrl = process.env.NEXT_PUBLIC_L2_RPC!;
 
 
 const lyraChain: Chain = {
@@ -50,8 +61,9 @@ const lyraChain: Chain = {
   }
 }
 
+// Usual ethers provider just to fetch L2 data
 const etherProvider = new providers.JsonRpcProvider(rpcUrl)
-const usdcContract = new ethers.Contract(stagingUSDC, usdcAbi, etherProvider);
+const usdcContract = new ethers.Contract(addresses.usdc, usdcAbi, etherProvider);
 
 
 export function useSmartWallet() {
@@ -90,14 +102,14 @@ export function useSmartWallet() {
 
       const provider = new SmartAccountProvider(
         createSplitRpcClient(bundlerUrl, rpcUrl, lyraChain),
-        entryPoint,
+        addresses.entryPoint,
         lyraChain
       ).connect(
         (rpcClient) =>
           new SimpleSmartContractAccount({
-            entryPointAddress: entryPoint,
+            entryPointAddress: addresses.entryPoint,
             chain: lyraChain,
-            factoryAddress: simpleAccountFactory,
+            factoryAddress: addresses.simpleAccountFactory,
             rpcClient: rpcClient,
             owner,
             accountAddress: rpcClient.account,
@@ -118,7 +130,7 @@ export function useSmartWallet() {
   async function sendERC20(transferAmount: string, sendToBundlerCallback?: Function, txConfirmedCallback?: Function) {
 
     // 1. build erc20 transactions
-    const target = stagingUSDC; // usdc address
+    const target = addresses.usdc; // usdc address
     const data = usdcContract.interface.encodeFunctionData("transfer(address,uint256)", [
       '0x7c54F6e650e5AA71112Bfd293b8092717953aF28', // recipient
       transferAmount,
@@ -144,8 +156,8 @@ export function useSmartWallet() {
     // send to the bundler
     const { hash } = await provider
       .withPaymasterMiddleware({
-        dummyPaymasterDataMiddleware: async () => {return {paymasterAndData: dumbPaymaster}}, // this is for verification
-        paymasterDataMiddleware: async () => {return {paymasterAndData: dumbPaymaster}}, // for real tx
+        dummyPaymasterDataMiddleware: async () => {return {paymasterAndData: addresses.dumbPaymaster}}, // this is for verification
+        paymasterDataMiddleware: async () => {return {paymasterAndData: addresses.dumbPaymaster}}, // for real tx
       })
       .withCustomMiddleware(async(userOps) => {
         return {
@@ -154,12 +166,10 @@ export function useSmartWallet() {
         }
       })
       .sendUserOperation({
-      target,
-      data,
-      value: BigInt(0),
-    }, {
-      paymasterAndData: dumbPaymaster, 
-    });
+        target,
+        data,
+        value: BigInt(0),
+      });
 
     console.log(`UserOpHash: ${hash}`);
     setOpHash(hash)
