@@ -1,22 +1,22 @@
-import { useState } from "react";
-import { Wallet, ethers } from "ethers";
-import { BundlerJsonRpcProvider, IUserOperationMiddlewareCtx } from "userop";
+import { useState, useEffect, useMemo } from "react";
+import { Wallet, ethers, providers } from "ethers";
 import usdcAbi from "../abi/usdc.json";
-import { getEthersSigner } from '../utils/common'
+import { walletClientToSigner } from '../utils/common'
 import { config } from "dotenv"
 import {
   convertEthersSignerToAccountSigner,
 } from "@alchemy/aa-ethers";
 import { createSplitRpcClient } from "../utils/client";
-import { usePublicClient } from "wagmi"
-
 
 import {
   SimpleSmartContractAccount,
   SmartAccountProvider,
 } from "@alchemy/aa-core";
+import {getWalletClient, type WalletClient} from "@wagmi/core"
+
 import { Chain } from "viem";
-import { useAccount } from "wagmi"
+import { useNetwork } from "wagmi";
+
 config()
 
 const entryPoint = "0x33a07c35557De1e916B26a049e1165D47d462f6B";
@@ -50,55 +50,70 @@ const lyraChain: Chain = {
   }
 }
 
-const etherProvider = new BundlerJsonRpcProvider(rpcUrl).setBundlerRpc(bundlerUrl);
+const etherProvider = new providers.JsonRpcProvider(rpcUrl)
 const usdcContract = new ethers.Contract(stagingUSDC, usdcAbi, etherProvider);
-
-// apply our own dumb paymaster: pay for anyone
-const paymasterMiddleware: (context: IUserOperationMiddlewareCtx) => Promise<void> = async (context) => {
-  context.op.paymasterAndData = dumbPaymaster;
-  // previously only 21000, need to add more (adding 30000)
-  // context.op.preVerificationGas = BigNumber.from(context.op.preVerificationGas).add(BigNumber.from(1000000));
-
-  // // need to update callGasLimit as well
-  // context.op.callGasLimit = BigNumber.from(context.op.callGasLimit).add(BigNumber.from(1000000));
-}
 
 
 export function useSmartWallet() {
 
-  const { address } = useAccount()
-  console.log("address 22", address)
+  const network = useNetwork()
 
+  const [smartAccountAddress, setSmartAccountAddress] = useState<string | undefined>(undefined)
 
-  const client = usePublicClient()
-  client.request = client.request.bind(client)
+  const [walletClient, setWalletClient] = useState<WalletClient | undefined>(undefined)
+  const [provider, setProvider] = useState<SmartAccountProvider | undefined>(undefined)
+
+  const walletReady = useMemo(() => walletClient !== undefined, [walletClient?.account]) 
+
+  // async: setup wagmi wallet client
+  useEffect(() => {
+    async function updateClient() {
+      const walletClient = await getWalletClient({ chainId: 5 }) as WalletClient
+      setWalletClient(walletClient)
+    }
+    updateClient()
+  }, [network.chains])
+
+  // async: setup smart account provider
+  useEffect(() => {
+    async function setupSmartAccountProvider() {
+      if (!walletClient) return
+      const signer = walletClientToSigner(walletClient)
+      if (!signer._isSigner) return
+
+      const owner = convertEthersSignerToAccountSigner(signer as Wallet)
+
+      const provider = new SmartAccountProvider(
+        createSplitRpcClient(bundlerUrl, rpcUrl, lyraChain),
+        entryPoint,
+        lyraChain
+      ).connect(
+        (rpcClient) =>
+          new SimpleSmartContractAccount({
+            entryPointAddress: entryPoint,
+            chain: lyraChain,
+            factoryAddress: simpleAccountFactory,
+            rpcClient: rpcClient,
+            owner,
+            accountAddress: rpcClient.account,
+          })
+      );
+      setProvider(provider)
+      const addr = await provider.getAddress()
+      setSmartAccountAddress(addr)
+    }
+    setupSmartAccountProvider()
+
+  }, [walletClient])
 
 
   async function sendERC20(transferAmount: string) {
 
-    const signer = await getEthersSigner({ chainId: 5 })
-    if (!signer._isSigner) return
+    // get the connected wallet (signer)
+    if (provider === undefined) return
+    
 
-    const owner = convertEthersSignerToAccountSigner(signer as Wallet)
-
-
-    const provider = new SmartAccountProvider(
-      createSplitRpcClient(bundlerUrl, rpcUrl, lyraChain),
-      entryPoint,
-      lyraChain
-    ).connect(
-      (rpcClient) =>
-        new SimpleSmartContractAccount({
-          entryPointAddress: entryPoint,
-          chain: lyraChain,
-          factoryAddress: simpleAccountFactory,
-          rpcClient: rpcClient,
-          owner,
-          accountAddress: rpcClient.account,
-        })
-    );
-
-    // build transaction: random send usdc tx
+    // 2. build transaction: random send usdc tx
     const target = stagingUSDC; // usdc address
     const data = usdcContract.interface.encodeFunctionData("transfer(address,uint256)", [
       '0x7c54F6e650e5AA71112Bfd293b8092717953aF28', // recipient
@@ -115,11 +130,8 @@ export function useSmartWallet() {
       value: BigInt(0)
     });
 
-
-
     console.log(`UserOpHash: ${hash}`);
-
   }
 
-  return { sendERC20 }
+  return { sendERC20, walletReady, provider, smartAccountAddress }
 }
