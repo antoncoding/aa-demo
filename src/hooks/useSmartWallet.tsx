@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Wallet, ethers, providers } from "ethers";
+import { BigNumber, BigNumberish, Wallet, ethers, providers } from "ethers";
 import usdcAbi from "../abi/usdc.json";
 import { walletClientToSigner } from '../utils/common'
 import { config } from "dotenv"
@@ -15,7 +15,7 @@ import {
 import {getWalletClient, type WalletClient} from "@wagmi/core"
 
 import { Chain } from "viem";
-import { useNetwork } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 
 config()
 
@@ -57,8 +57,13 @@ const usdcContract = new ethers.Contract(stagingUSDC, usdcAbi, etherProvider);
 export function useSmartWallet() {
 
   const network = useNetwork()
+  const connectedWallet = useAccount()
 
   const [smartAccountAddress, setSmartAccountAddress] = useState<string | undefined>(undefined)
+  const [usdcBalance, setUSDCBalance] = useState<string | undefined>(undefined)
+  
+  const [opHash, setOpHash] = useState<string | undefined>(undefined)
+  const [txHash, setTxHash] = useState<string | undefined>(undefined)
 
   const [walletClient, setWalletClient] = useState<WalletClient | undefined>(undefined)
   const [provider, setProvider] = useState<SmartAccountProvider | undefined>(undefined)
@@ -72,7 +77,7 @@ export function useSmartWallet() {
       setWalletClient(walletClient)
     }
     updateClient()
-  }, [network.chains])
+  }, [network.chains, connectedWallet.address])
 
   // async: setup smart account provider
   useEffect(() => {
@@ -101,12 +106,15 @@ export function useSmartWallet() {
       setProvider(provider)
       const addr = await provider.getAddress()
       setSmartAccountAddress(addr)
+
+      const balance = await usdcContract.balanceOf(addr)
+      setUSDCBalance(ethers.utils.formatUnits(balance, 'mwei')); // 6 decimals
     }
     setupSmartAccountProvider()
 
   }, [walletClient])
 
-
+  
   async function sendERC20(transferAmount: string) {
 
     // get the connected wallet (signer)
@@ -121,17 +129,36 @@ export function useSmartWallet() {
     ]) as `0x${string}`
 
     // 3. send a UserOperation
-    const { hash } = await provider.withPaymasterMiddleware({
-      dummyPaymasterDataMiddleware: async () => {return {paymasterAndData: dumbPaymaster}},
-      paymasterDataMiddleware: async () => {return {paymasterAndData: dumbPaymaster}},
-    }).sendUserOperation({
+    const { hash } = await provider
+      .withPaymasterMiddleware({
+        dummyPaymasterDataMiddleware: async () => {return {paymasterAndData: dumbPaymaster}},
+        paymasterDataMiddleware: async () => {return {paymasterAndData: dumbPaymaster}},
+      })
+      .withCustomMiddleware(async(userOps) => {
+        return {
+          ...userOps,
+          verificationGasLimit: BigNumber.from(userOps.verificationGasLimit as bigint).mul(2).toString(), // first time wallet
+        }
+      })
+      .sendUserOperation({
       target,
       data,
-      value: BigInt(0)
-    });
+      value: BigInt(0),
+    }, {
+      paymasterAndData: dumbPaymaster, 
+     });
 
     console.log(`UserOpHash: ${hash}`);
+    setOpHash(hash)
+
+    const result = await provider.waitForUserOperationTransaction(hash as `0x${string}`)
+    console.log("tx Hash", result)
+    setTxHash(result)
+
+    // temp: update balance
+    const balance = await usdcContract.balanceOf(smartAccountAddress)
+    setUSDCBalance(ethers.utils.formatUnits(balance, 'mwei')); // 6 decimals
   }
 
-  return { sendERC20, walletReady, provider, smartAccountAddress }
+  return { sendERC20, walletReady, provider, smartAccountAddress, usdcBalance, opHash, txHash }
 }

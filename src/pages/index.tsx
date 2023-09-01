@@ -3,7 +3,6 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import {useSmartWallet} from "../hooks/useSmartWallet"
-import { useEffect } from 'react'
 import { useNetwork } from 'wagmi'
 
 
@@ -11,7 +10,7 @@ const Home: NextPage = () => {
 
   const {chain} = useNetwork()
 
-  const { sendERC20, walletReady, smartAccountAddress } = useSmartWallet()
+  const { sendERC20, walletReady, smartAccountAddress, usdcBalance, txHash } = useSmartWallet()
 
   const handleClick = async () => {
     await sendERC20('5000000')
@@ -33,7 +32,10 @@ const Home: NextPage = () => {
         <p style={{padding: 20}}>
           Smart Account Address: {smartAccountAddress ? smartAccountAddress : 'loading...'}
         </p>
-
+        <p style={{padding: 20}}>
+          USDC Balance: {usdcBalance ? usdcBalance : 'loading...'}
+        </p>
+    
         <div className={styles.grid}>
 
           <Button
@@ -52,6 +54,10 @@ const Home: NextPage = () => {
               <p>Send ERC20</p>
             </Button>
         </div>
+
+        <p style={{padding: 20}}>
+          txHash: {txHash ? txHash : 'no userOp sent'}
+        </p>
       </main>
     </div>
   )
