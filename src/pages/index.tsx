@@ -2,17 +2,14 @@ import { Button } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import {useAccount, useWalletClient} from "wagmi"
 import {useSmartWallet} from "../hooks/useSmartWallet"
 
 const Home: NextPage = () => {
 
-  const {address} = useAccount()
-  console.log('addr', address)
-
   const { sendERC20 } = useSmartWallet()
 
   const handleClick = async () => {
+    console.log("click")
     await sendERC20('5000000')
   }
 
