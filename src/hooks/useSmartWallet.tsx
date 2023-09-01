@@ -132,7 +132,7 @@ export function useSmartWallet() {
     // 1. build erc20 transactions
     const target = addresses.usdc; // usdc address
     const data = usdcContract.interface.encodeFunctionData("transfer(address,uint256)", [
-      '0x7c54F6e650e5AA71112Bfd293b8092717953aF28', // recipient
+      '0x7c54F6e650e5AA71112Bfd293b8092717953aF28', // random recipient
       transferAmount,
     ]) as `0x${string}`
 

@@ -3,7 +3,6 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import {useSmartWallet} from "../hooks/useSmartWallet"
-import { useNetwork } from 'wagmi'
 import { useToast } from '@chakra-ui/react'
 
 
@@ -23,7 +22,7 @@ const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
-        <title>AA For Lyra</title>
+        <title>Lyra Account Abstraction!</title>
         <meta name="description" content="ETH + Next.js DApp Boilerplate by ilyxium" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
