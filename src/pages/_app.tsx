@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import '../styles/globals.css'
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -20,36 +21,52 @@ import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { Page } from '../components/Page'
 import { theme } from '../styles/theme'
 import { connectorsForWallets } from '@rainbow-me/rainbowkit'
-import { injectedWallet, metaMaskWallet } from '@rainbow-me/rainbowkit/wallets'
-import { publicProvider } from 'wagmi/providers/public'
+import { injectedWallet } from '@rainbow-me/rainbowkit/wallets'
+// import { publicProvider } from 'wagmi/providers/public'
 
 
 import {config} from "dotenv"
-import { type } from 'os';
 config()
 
 const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY!;
 
-const { chains, publicClient } = (typeof window !== 'undefined') ? configureChains(
+const { chains, publicClient } = configureChains(
   [goerli],
   [
     alchemyProvider({apiKey: alchemyKey}),
-    publicProvider(),
   ]
-) : {chains: [], publicClient: undefined};
+);
 
-const wagmiConfig = publicClient !== undefined ? createConfig({
-  autoConnect: true,
+const wagmiConfig = createConfig({
+  autoConnect: false,
   connectors: connectorsForWallets([{
     groupName: 'Recommended',
-    wallets: [metaMaskWallet({ chains, projectId: 'Lyra' }), injectedWallet({ chains })],
+    wallets: [
+      injectedWallet({ chains }),
+    ]
   }]),
+  //   groupName: 'Recommended',
+  //   wallets: [
+  //     // metaMaskWallet({ chains, projectId: 'Lyra' }), 
+  //     // injectedWallet({ chains }),
+  //   ],
   publicClient
-}) : undefined
+})
 
 function MyApp({ Component, pageProps }: AppProps) {
 
-  return ((typeof window === 'undefined' || wagmiConfig === undefined) ? <>/</> : <WagmiConfig config={wagmiConfig}>
+  const [showChild, setShowChild] = useState(false);
+  useEffect(() => {
+    setShowChild(true);
+  }, []);
+
+  if (!showChild) {
+    return null;
+  }
+
+  if (typeof window === 'undefined') {
+    return <></>;
+  } else return (<WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={chains}>
         <ChakraProvider theme={theme}>
           <Page>
