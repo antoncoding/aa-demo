@@ -30,10 +30,9 @@ const Home: NextPage = () => {
         <meta name="description" content="ETH + Next.js DApp Boilerplate by ilyxium" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
       <main className={styles.main}>
         <h3 className={styles.title}>
-          Hola!
+          ¡Hola!
         </h3>
 
         <p style={{padding: 20}}>

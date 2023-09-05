@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import NextLink from 'next/link'
 
 import { Box, Flex, HStack, Stack, Text } from '@chakra-ui/layout'
 import {
@@ -9,30 +8,17 @@ import {
   DrawerOverlay,
   useDisclosure,
   Button,
-  Link
 } from '@chakra-ui/react'
 import {
-  InformationCircleIcon,
-  LoginIcon,
   MenuIcon,
   XIcon
 } from '@heroicons/react/outline'
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { NavDrawerItem, NavItem } from './NavItem'
 
-// @ts-ignore
-import { SocialIcon } from 'react-social-icons'
-
 export const Header = () => {
 
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure()
-
-  const navItems = [
-    {
-      text: 'home',
-      href: '/'
-    },
-  ]
 
   return (
     <header>
@@ -52,11 +38,7 @@ export const Header = () => {
               gap={{ lg: '0.4rem', xl: '1.5rem' }}
               mr={4}
             >
-              {navItems.map((navItem, index) => (
-                <NavItem key={index} href={navItem.href}>
-                  <Text className="capitalize">{navItem.text}</Text>
-                </NavItem>
-              ))}
+            <NavItem key="id-0" href={'/'} text="Home">  </NavItem>
             </HStack>
 
             {/* Connect Wallet Button */}
@@ -125,30 +107,13 @@ export const Header = () => {
               </Flex>
             </Box>
 
-            {/* Mapping through Links */}
-            {navItems.map((navItem, index) => (
-              <NavDrawerItem onClick={onToggle} key={index} href={navItem.href}>
-                <Flex alignItems="center" gap={2}>
-                  <Text padding="0" fontSize={'2rem'}>
-                    {navItem.text}
-                  </Text>
-                </Flex>
-              </NavDrawerItem>
-            ))}
-            {/* Twitter Wrapper */}
-            <Flex
-              width="100%"
-              justify="space-between"
-              bottom="2rem"
-              alignItems="center"
-              left="0"
-              paddingX="1.5rem"
-              position="absolute"
-            >
-              {/* Twitter Link - URL SHOULD BE UPDATED */}
-              <SocialIcon bgColor="white" url="https://twitter.com/ilyxium" target="_blank" />
-
-            </Flex>
+            <NavDrawerItem onClick={onToggle} key={"id-"} href={"/"}>
+              <Flex alignItems="center" gap={2}>
+                <Text padding="0" fontSize={'2rem'}>
+                  {'Home'}
+                </Text>
+              </Flex>
+            </NavDrawerItem>
           </DrawerBody>
         </DrawerContent>
       </Drawer>

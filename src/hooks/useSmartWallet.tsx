@@ -198,7 +198,7 @@ export function useSmartWallet() {
       data: encodeFunctionData({
         abi: matchingAbi,
         functionName: "depositSubAccount",
-        args: [nextSubAccountId.add(1).toString()] // notice: this might cuase error when multiple users are signing up at the same time
+        args: [nextSubAccountId.add(1).toString()] // notice: this might cause error when multiple users are signing up at the same time
       })
     })
     await sendBatchedTxs(txs, txConfirmedCallback)
