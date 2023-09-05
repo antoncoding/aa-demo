@@ -5,6 +5,7 @@ import { walletClientToSigner } from '../utils/common'
 import {
   convertEthersSignerToAccountSigner,
 } from "@alchemy/aa-ethers";
+
 import { createSplitRpcClient } from "../utils/client";
 import { encodeFunctionData } from 'viem'
 
@@ -92,7 +93,7 @@ export function useSmartWallet() {
   const [walletClient, setWalletClient] = useState<WalletClient | undefined>(undefined)
   const [provider, setProvider] = useState<SmartAccountProvider | undefined>(undefined)
 
-  const walletReady = useMemo(() => walletClient !== undefined, [walletClient?.account]) 
+  const walletReady = useMemo(() => walletClient !== undefined, [walletClient]) 
 
   // async: setup wagmi wallet client
   useEffect(() => {

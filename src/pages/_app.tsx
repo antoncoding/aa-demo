@@ -5,7 +5,6 @@ import type { AppProps } from 'next/app'
 import { ChakraProvider } from '@chakra-ui/react'
 
 import {
-  getDefaultWallets,
   RainbowKitProvider,
 } from '@rainbow-me/rainbowkit';
 
@@ -26,31 +25,31 @@ import { publicProvider } from 'wagmi/providers/public'
 
 
 import {config} from "dotenv"
+import { type } from 'os';
 config()
 
 const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY!;
 
-const { chains, publicClient } = configureChains(
+const { chains, publicClient } = (typeof window !== 'undefined') ? configureChains(
   [goerli],
   [
     alchemyProvider({apiKey: alchemyKey}),
     publicProvider(),
   ]
-);
+) : {chains: [], publicClient: undefined};
 
-const wagmiConfig = createConfig({
+const wagmiConfig = publicClient !== undefined ? createConfig({
   autoConnect: true,
   connectors: connectorsForWallets([{
     groupName: 'Recommended',
     wallets: [metaMaskWallet({ chains, projectId: 'Lyra' }), injectedWallet({ chains })],
   }]),
   publicClient
-})
+}) : undefined
 
 function MyApp({ Component, pageProps }: AppProps) {
 
-  return (
-    <WagmiConfig config={wagmiConfig}>
+  return ((typeof window === 'undefined' || wagmiConfig === undefined) ? <>/</> : <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={chains}>
         <ChakraProvider theme={theme}>
           <Page>
