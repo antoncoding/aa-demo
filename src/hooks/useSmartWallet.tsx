@@ -82,7 +82,7 @@ const subAccounts = new ethers.Contract(addresses.subAccounts, subAccountsAbi, e
 export function useSmartWallet() {
 
   const network = useNetwork()
-  const connectedWallet = useAccount()
+  const {address: connectedEOA} = useAccount()
 
   const [smartAccountAddress, setSmartAccountAddress] = useState<string | undefined>(undefined)
   const [usdcBalance, setUSDCBalance] = useState<string | undefined>(undefined)
@@ -102,12 +102,15 @@ export function useSmartWallet() {
       setWalletClient(walletClient)
     }
     updateClient()
-  }, [network.chains, connectedWallet.address])
+  }, [network.chains, connectedEOA])
 
   // async: setup smart account provider
   useEffect(() => {
     async function setupSmartAccountProvider() {
-      if (!walletClient) return
+      if (!walletClient) {
+        setSmartAccountAddress(undefined)
+        return
+      }
       const signer = walletClientToSigner(walletClient)
       if (!signer._isSigner) return
 
@@ -130,6 +133,8 @@ export function useSmartWallet() {
       );
       setProvider(provider)
       const addr = await provider.getAddress()
+
+      // set address
       setSmartAccountAddress(addr)
 
       const balance = await usdcContract.balanceOf(addr)
@@ -139,8 +144,12 @@ export function useSmartWallet() {
 
   }, [walletClient])
 
-  async function enableTrading(txConfirmedCallback?: Function) {
-
+  /**
+   * @dev send batched tx to create subAccount + deposit USDC
+   * @param txConfirmedCallback 
+   * @returns 
+   */
+  async function enableTrading(initAmount: string, txConfirmedCallback?: Function) {
     if (smartAccountAddress === undefined) return
 
     // todo: replace with a wrapper contract to make sure subAccountIds don't collide
@@ -165,7 +174,7 @@ export function useSmartWallet() {
       data: encodeFunctionData({
         abi: usdcAbi, 
         functionName: "approve", 
-        args: [addresses.cash, 1000000000]
+        args: [addresses.cash, initAmount]
       })
     })
   
@@ -176,7 +185,7 @@ export function useSmartWallet() {
       data: encodeFunctionData({
         abi: cashAbi,
         functionName: "depositToNewAccount", 
-        args: [smartAccountAddress, "100000000", addresses.standardManager] // recipient, stableAmount (100), manager 
+        args: [smartAccountAddress, initAmount, addresses.standardManager] // recipient, stableAmount (100), manager 
       })
     })
 

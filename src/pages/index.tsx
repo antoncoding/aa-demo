@@ -5,11 +5,14 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import {useSmartWallet} from "../hooks/useSmartWallet"
 import { useToast } from '@chakra-ui/react'
+import { useAccount } from 'wagmi'
 
 
 const Home: NextPage = () => {
 
   const toast = useToast();
+
+  const { address } = useAccount()
 
   const { sendERC20, walletReady, smartAccountAddress, usdcBalance, txHash, enableTrading } = useSmartWallet()
 
@@ -20,13 +23,14 @@ const Home: NextPage = () => {
   }
 
   const handleEnableTrading = async () => {
-    await enableTrading(() => toast({title:'Tx confirmed'}))
+    const initDepositAmount = '100000000';
+    await enableTrading(initDepositAmount, () => toast({title:'Tx confirmed'}))
   }
 
   return (
     <div className={styles.container}>
       <Head>
-        <title>Lyra Account Abstraction!</title>
+        <title>Lyra V2 AA</title>
         <meta name="description" content="ETH + Next.js DApp Boilerplate by ilyxium" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -36,7 +40,7 @@ const Home: NextPage = () => {
         </h3>
 
         <p style={{padding: 20}}>
-          Smart Account Address: {smartAccountAddress ? smartAccountAddress : 'loading...'}
+          Smart Account Address: {smartAccountAddress ? smartAccountAddress : address ? 'loading...' : 'not connected'}
         </p>
         <p style={{padding: 20}}>
           USDC Balance: {usdcBalance ? usdcBalance : 'loading...'}
@@ -46,7 +50,7 @@ const Home: NextPage = () => {
 
           <Button
               backgroundColor="#32CD32"
-              borderRadius="25px"
+              borderRadius="7px"
               margin={2.5}
               _hover={{
                 bg: '#121212'
@@ -62,7 +66,7 @@ const Home: NextPage = () => {
 
             <Button
               backgroundColor="#32CD32"
-              borderRadius="25px"
+              borderRadius="7px"
               margin={2.5}
               _hover={{
                 bg: '#121212'
