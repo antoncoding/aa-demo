@@ -9,8 +9,11 @@ export const Page: FC = ({ children }) => {
     <>
       <Head>
         <title>page title</title>
-        <meta name="description" content="Ethereum + Next.js DApp Boilerplate" />
+        <meta name="description" content="Account Abstraction on L2" />
         <link rel="icon" href="/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com"/>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300&family=Victor+Mono:wght@200&display=swap" rel="stylesheet"/>
       </Head>
 
       <Flex direction="column" backgroundColor="#1F1B24">

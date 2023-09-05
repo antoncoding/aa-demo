@@ -35,14 +35,17 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <h3 className={styles.title}>
+        <h3 className={styles.title} style={{padding: 20}}>
           ¡Hola!
         </h3>
 
-        <p style={{padding: 20}}>
-          Smart Account Address: {smartAccountAddress ? smartAccountAddress : address ? 'loading...' : 'not connected'}
+        <p className='hex'>
+          EOA: {address ? address : 'not connected'}
         </p>
-        <p style={{padding: 20}}>
+        <p className='hex'>
+          SCW: {smartAccountAddress ? smartAccountAddress : address ? 'loading...' : 'not connected'}
+        </p>
+        <p style={{paddingTop: 50}}>
           USDC Balance: {usdcBalance ? usdcBalance : 'loading...'}
         </p>
     
@@ -81,8 +84,8 @@ const Home: NextPage = () => {
             </Button>
         </div>
 
-        <p style={{padding: 20}}>
-          txHash: {txHash ? txHash : 'no userOp sent'}
+        <p className='hex'>
+          txHash: {txHash ? txHash : '-'}
         </p>
       </main>
     </div>
