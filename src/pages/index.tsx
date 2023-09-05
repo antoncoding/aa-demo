@@ -11,12 +11,16 @@ const Home: NextPage = () => {
 
   const toast = useToast();
 
-  const { sendERC20, walletReady, smartAccountAddress, usdcBalance, txHash } = useSmartWallet()
+  const { sendERC20, walletReady, smartAccountAddress, usdcBalance, txHash, enableTrading } = useSmartWallet()
 
   const handleClick = async () => {
     await sendERC20('5000000', 
     () => toast({title:'Tx Sent To bundler'}), 
     () => toast({title:'Tx confirmed'}))
+  }
+
+  const handleEnableTrading = async () => {
+    await enableTrading(() => toast({title:'Tx confirmed'}))
   }
 
   return (
@@ -55,6 +59,22 @@ const Home: NextPage = () => {
               onClick={() => handleClick()}
             >
               <p>Send 5 USDC</p>
+            </Button>
+
+            <Button
+              backgroundColor="#32CD32"
+              borderRadius="25px"
+              margin={2.5}
+              _hover={{
+                bg: '#121212'
+              }}
+              _active={{
+                bg: '#121212'
+              }}
+              disabled={!walletReady}
+              onClick={() => handleEnableTrading()}
+            >
+              <p>Enable Trading</p>
             </Button>
         </div>
 

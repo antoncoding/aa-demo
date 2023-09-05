@@ -1,0 +1,1818 @@
+[
+  {
+      "inputs": [
+          {
+              "internalType": "string",
+              "name": "name_",
+              "type": "string"
+          },
+          {
+              "internalType": "string",
+              "name": "symbol_",
+              "type": "string"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "caller",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          }
+      ],
+      "name": "AC_CannotChangeToSameManager",
+      "type": "error"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "caller",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          }
+      ],
+      "name": "AC_CannotTransferAssetToOneself",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "AC_InvalidNonce",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "AC_InvalidPermitSignature",
+      "type": "error"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "spender",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+          },
+          {
+              "internalType": "contract IManager",
+              "name": "manager",
+              "type": "address"
+          },
+          {
+              "internalType": "address",
+              "name": "approved",
+              "type": "address"
+          }
+      ],
+      "name": "AC_NotOwnerOrERC721Approved",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "AC_OnlyAsset",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "AC_OnlyManager",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "AC_SignatureExpired",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "AC_TooManyTransfers",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "DL_DeltasTooLong",
+      "type": "error"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "caller",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "internalType": "int256",
+              "name": "amount",
+              "type": "int256"
+          },
+          {
+              "internalType": "uint256",
+              "name": "subIdAllowance",
+              "type": "uint256"
+          },
+          {
+              "internalType": "uint256",
+              "name": "assetAllowance",
+              "type": "uint256"
+          }
+      ],
+      "name": "NotEnoughSubIdOrAssetAllowances",
+      "type": "error"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+          },
+          {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "manager",
+              "type": "address"
+          }
+      ],
+      "name": "AccountBurned",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+          },
+          {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "manager",
+              "type": "address"
+          }
+      ],
+      "name": "AccountCreated",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "oldManager",
+              "type": "address"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newManager",
+              "type": "address"
+          }
+      ],
+      "name": "AccountManagerChanged",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "approved",
+              "type": "address"
+          },
+          {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+          }
+      ],
+      "name": "Approval",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "operator",
+              "type": "address"
+          },
+          {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "approved",
+              "type": "bool"
+          }
+      ],
+      "name": "ApprovalForAll",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "fromAcc",
+              "type": "uint256"
+          },
+          {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "toAcc",
+              "type": "uint256"
+          },
+          {
+              "indexed": false,
+              "internalType": "contract IAsset",
+              "name": "asset",
+              "type": "address"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "subId",
+              "type": "uint256"
+          },
+          {
+              "indexed": false,
+              "internalType": "int256",
+              "name": "amount",
+              "type": "int256"
+          },
+          {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "assetData",
+              "type": "bytes32"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "tradeId",
+              "type": "uint256"
+          }
+      ],
+      "name": "AssetTransferred",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "manager",
+              "type": "address"
+          },
+          {
+              "components": [
+                  {
+                      "internalType": "contract IAsset",
+                      "name": "asset",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint96",
+                      "name": "subId",
+                      "type": "uint96"
+                  }
+              ],
+              "indexed": true,
+              "internalType": "struct ISubAccounts.HeldAsset",
+              "name": "assetAndSubId",
+              "type": "tuple"
+          },
+          {
+              "indexed": false,
+              "internalType": "int256",
+              "name": "amount",
+              "type": "int256"
+          },
+          {
+              "indexed": false,
+              "internalType": "int256",
+              "name": "preBalance",
+              "type": "int256"
+          },
+          {
+              "indexed": false,
+              "internalType": "int256",
+              "name": "postBalance",
+              "type": "int256"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "tradeId",
+              "type": "uint256"
+          }
+      ],
+      "name": "BalanceAdjusted",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "from",
+              "type": "address"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+          },
+          {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+          }
+      ],
+      "name": "Transfer",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": false,
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "wordPos",
+              "type": "uint256"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "mask",
+              "type": "uint256"
+          }
+      ],
+      "name": "UnorderedNonceInvalidated",
+      "type": "event"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+          }
+      ],
+      "name": "approve",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "components": [
+                  {
+                      "internalType": "uint256",
+                      "name": "acc",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "contract IAsset",
+                      "name": "asset",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "subId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "int256",
+                      "name": "amount",
+                      "type": "int256"
+                  },
+                  {
+                      "internalType": "bytes32",
+                      "name": "assetData",
+                      "type": "bytes32"
+                  }
+              ],
+              "internalType": "struct ISubAccounts.AssetAdjustment",
+              "name": "adjustment",
+              "type": "tuple"
+          },
+          {
+              "internalType": "bool",
+              "name": "triggerAssetHook",
+              "type": "bool"
+          },
+          {
+              "internalType": "bytes",
+              "name": "managerData",
+              "type": "bytes"
+          }
+      ],
+      "name": "assetAdjustment",
+      "outputs": [
+          {
+              "internalType": "int256",
+              "name": "postAdjustmentBalance",
+              "type": "int256"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          },
+          {
+              "internalType": "contract IAsset",
+              "name": "",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "name": "balanceAndOrder",
+      "outputs": [
+          {
+              "internalType": "int240",
+              "name": "balance",
+              "type": "int240"
+          },
+          {
+              "internalType": "uint16",
+              "name": "order",
+              "type": "uint16"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+          }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "internalType": "contract IManager",
+              "name": "newManager",
+              "type": "address"
+          },
+          {
+              "internalType": "bytes",
+              "name": "newManagerData",
+              "type": "bytes"
+          }
+      ],
+      "name": "changeManager",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+          },
+          {
+              "internalType": "contract IManager",
+              "name": "_manager",
+              "type": "address"
+          }
+      ],
+      "name": "createAccount",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "newId",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+          },
+          {
+              "internalType": "address",
+              "name": "spender",
+              "type": "address"
+          },
+          {
+              "internalType": "contract IManager",
+              "name": "_manager",
+              "type": "address"
+          }
+      ],
+      "name": "createAccountWithApproval",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "newId",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "domainSeparator",
+      "outputs": [
+          {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          }
+      ],
+      "name": "getAccountBalances",
+      "outputs": [
+          {
+              "components": [
+                  {
+                      "internalType": "contract IAsset",
+                      "name": "asset",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "subId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "int256",
+                      "name": "balance",
+                      "type": "int256"
+                  }
+              ],
+              "internalType": "struct ISubAccounts.AssetBalance[]",
+              "name": "assetBalances",
+              "type": "tuple[]"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+          }
+      ],
+      "name": "getApproved",
+      "outputs": [
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "internalType": "contract IAsset",
+              "name": "asset",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "subId",
+              "type": "uint256"
+          }
+      ],
+      "name": "getBalance",
+      "outputs": [
+          {
+              "internalType": "int256",
+              "name": "balance",
+              "type": "int256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          }
+      ],
+      "name": "getUniqueAssets",
+      "outputs": [
+          {
+              "internalType": "address[]",
+              "name": "uniqueAssets",
+              "type": "address[]"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          },
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "name": "heldAssets",
+      "outputs": [
+          {
+              "internalType": "contract IAsset",
+              "name": "asset",
+              "type": "address"
+          },
+          {
+              "internalType": "uint96",
+              "name": "subId",
+              "type": "uint96"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "wordPos",
+              "type": "uint256"
+          },
+          {
+              "internalType": "uint256",
+              "name": "mask",
+              "type": "uint256"
+          }
+      ],
+      "name": "invalidateUnorderedNonces",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+          },
+          {
+              "internalType": "address",
+              "name": "operator",
+              "type": "address"
+          }
+      ],
+      "name": "isApprovedForAll",
+      "outputs": [
+          {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "lastAccountId",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "lastTradeId",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "name": "manager",
+      "outputs": [
+          {
+              "internalType": "contract IManager",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "components": [
+                  {
+                      "internalType": "uint256",
+                      "name": "acc",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "contract IAsset",
+                      "name": "asset",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "subId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "int256",
+                      "name": "amount",
+                      "type": "int256"
+                  },
+                  {
+                      "internalType": "bytes32",
+                      "name": "assetData",
+                      "type": "bytes32"
+                  }
+              ],
+              "internalType": "struct ISubAccounts.AssetAdjustment",
+              "name": "adjustment",
+              "type": "tuple"
+          }
+      ],
+      "name": "managerAdjustment",
+      "outputs": [
+          {
+              "internalType": "int256",
+              "name": "postAdjustmentBalance",
+              "type": "int256"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "name",
+      "outputs": [
+          {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          },
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          },
+          {
+              "internalType": "contract IAsset",
+              "name": "",
+              "type": "address"
+          },
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "name": "negativeAssetAllowance",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          },
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          },
+          {
+              "internalType": "contract IAsset",
+              "name": "",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          },
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "name": "negativeSubIdAllowance",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "name": "nonceBitmap",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+          }
+      ],
+      "name": "ownerOf",
+      "outputs": [
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "components": [
+                  {
+                      "internalType": "address",
+                      "name": "delegate",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "nonce",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "accountId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "deadline",
+                      "type": "uint256"
+                  },
+                  {
+                      "components": [
+                          {
+                              "internalType": "contract IAsset",
+                              "name": "asset",
+                              "type": "address"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "positive",
+                              "type": "uint256"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "negative",
+                              "type": "uint256"
+                          }
+                      ],
+                      "internalType": "struct IAllowances.AssetAllowance[]",
+                      "name": "assetAllowances",
+                      "type": "tuple[]"
+                  },
+                  {
+                      "components": [
+                          {
+                              "internalType": "contract IAsset",
+                              "name": "asset",
+                              "type": "address"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "subId",
+                              "type": "uint256"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "positive",
+                              "type": "uint256"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "negative",
+                              "type": "uint256"
+                          }
+                      ],
+                      "internalType": "struct IAllowances.SubIdAllowance[]",
+                      "name": "subIdAllowances",
+                      "type": "tuple[]"
+                  }
+              ],
+              "internalType": "struct IAllowances.PermitAllowance",
+              "name": "allowancePermit",
+              "type": "tuple"
+          },
+          {
+              "internalType": "bytes",
+              "name": "signature",
+              "type": "bytes"
+          }
+      ],
+      "name": "permit",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "components": [
+                  {
+                      "internalType": "uint256",
+                      "name": "fromAcc",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "toAcc",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "contract IAsset",
+                      "name": "asset",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "subId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "int256",
+                      "name": "amount",
+                      "type": "int256"
+                  },
+                  {
+                      "internalType": "bytes32",
+                      "name": "assetData",
+                      "type": "bytes32"
+                  }
+              ],
+              "internalType": "struct ISubAccounts.AssetTransfer",
+              "name": "assetTransfer",
+              "type": "tuple"
+          },
+          {
+              "internalType": "bytes",
+              "name": "managerData",
+              "type": "bytes"
+          },
+          {
+              "components": [
+                  {
+                      "internalType": "address",
+                      "name": "delegate",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "nonce",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "accountId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "deadline",
+                      "type": "uint256"
+                  },
+                  {
+                      "components": [
+                          {
+                              "internalType": "contract IAsset",
+                              "name": "asset",
+                              "type": "address"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "positive",
+                              "type": "uint256"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "negative",
+                              "type": "uint256"
+                          }
+                      ],
+                      "internalType": "struct IAllowances.AssetAllowance[]",
+                      "name": "assetAllowances",
+                      "type": "tuple[]"
+                  },
+                  {
+                      "components": [
+                          {
+                              "internalType": "contract IAsset",
+                              "name": "asset",
+                              "type": "address"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "subId",
+                              "type": "uint256"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "positive",
+                              "type": "uint256"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "negative",
+                              "type": "uint256"
+                          }
+                      ],
+                      "internalType": "struct IAllowances.SubIdAllowance[]",
+                      "name": "subIdAllowances",
+                      "type": "tuple[]"
+                  }
+              ],
+              "internalType": "struct IAllowances.PermitAllowance",
+              "name": "allowancePermit",
+              "type": "tuple"
+          },
+          {
+              "internalType": "bytes",
+              "name": "signature",
+              "type": "bytes"
+          }
+      ],
+      "name": "permitAndSubmitTransfer",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "tradeId",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "components": [
+                  {
+                      "internalType": "uint256",
+                      "name": "fromAcc",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "toAcc",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "contract IAsset",
+                      "name": "asset",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "subId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "int256",
+                      "name": "amount",
+                      "type": "int256"
+                  },
+                  {
+                      "internalType": "bytes32",
+                      "name": "assetData",
+                      "type": "bytes32"
+                  }
+              ],
+              "internalType": "struct ISubAccounts.AssetTransfer[]",
+              "name": "assetTransfers",
+              "type": "tuple[]"
+          },
+          {
+              "internalType": "bytes",
+              "name": "managerData",
+              "type": "bytes"
+          },
+          {
+              "components": [
+                  {
+                      "internalType": "address",
+                      "name": "delegate",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "nonce",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "accountId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "deadline",
+                      "type": "uint256"
+                  },
+                  {
+                      "components": [
+                          {
+                              "internalType": "contract IAsset",
+                              "name": "asset",
+                              "type": "address"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "positive",
+                              "type": "uint256"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "negative",
+                              "type": "uint256"
+                          }
+                      ],
+                      "internalType": "struct IAllowances.AssetAllowance[]",
+                      "name": "assetAllowances",
+                      "type": "tuple[]"
+                  },
+                  {
+                      "components": [
+                          {
+                              "internalType": "contract IAsset",
+                              "name": "asset",
+                              "type": "address"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "subId",
+                              "type": "uint256"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "positive",
+                              "type": "uint256"
+                          },
+                          {
+                              "internalType": "uint256",
+                              "name": "negative",
+                              "type": "uint256"
+                          }
+                      ],
+                      "internalType": "struct IAllowances.SubIdAllowance[]",
+                      "name": "subIdAllowances",
+                      "type": "tuple[]"
+                  }
+              ],
+              "internalType": "struct IAllowances.PermitAllowance[]",
+              "name": "allowancePermits",
+              "type": "tuple[]"
+          },
+          {
+              "internalType": "bytes[]",
+              "name": "signatures",
+              "type": "bytes[]"
+          }
+      ],
+      "name": "permitAndSubmitTransfers",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "tradeId",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          },
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          },
+          {
+              "internalType": "contract IAsset",
+              "name": "",
+              "type": "address"
+          },
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "name": "positiveAssetAllowance",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          },
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          },
+          {
+              "internalType": "contract IAsset",
+              "name": "",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          },
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "name": "positiveSubIdAllowance",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "from",
+              "type": "address"
+          },
+          {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+          }
+      ],
+      "name": "safeTransferFrom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "from",
+              "type": "address"
+          },
+          {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+          },
+          {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+          }
+      ],
+      "name": "safeTransferFrom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "operator",
+              "type": "address"
+          },
+          {
+              "internalType": "bool",
+              "name": "approved",
+              "type": "bool"
+          }
+      ],
+      "name": "setApprovalForAll",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "internalType": "address",
+              "name": "delegate",
+              "type": "address"
+          },
+          {
+              "components": [
+                  {
+                      "internalType": "contract IAsset",
+                      "name": "asset",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "positive",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "negative",
+                      "type": "uint256"
+                  }
+              ],
+              "internalType": "struct IAllowances.AssetAllowance[]",
+              "name": "allowances",
+              "type": "tuple[]"
+          }
+      ],
+      "name": "setAssetAllowances",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "internalType": "address",
+              "name": "delegate",
+              "type": "address"
+          },
+          {
+              "components": [
+                  {
+                      "internalType": "contract IAsset",
+                      "name": "asset",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "subId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "positive",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "negative",
+                      "type": "uint256"
+                  }
+              ],
+              "internalType": "struct IAllowances.SubIdAllowance[]",
+              "name": "allowances",
+              "type": "tuple[]"
+          }
+      ],
+      "name": "setSubIdAllowances",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "components": [
+                  {
+                      "internalType": "uint256",
+                      "name": "fromAcc",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "toAcc",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "contract IAsset",
+                      "name": "asset",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "subId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "int256",
+                      "name": "amount",
+                      "type": "int256"
+                  },
+                  {
+                      "internalType": "bytes32",
+                      "name": "assetData",
+                      "type": "bytes32"
+                  }
+              ],
+              "internalType": "struct ISubAccounts.AssetTransfer",
+              "name": "assetTransfer",
+              "type": "tuple"
+          },
+          {
+              "internalType": "bytes",
+              "name": "managerData",
+              "type": "bytes"
+          }
+      ],
+      "name": "submitTransfer",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "tradeId",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "components": [
+                  {
+                      "internalType": "uint256",
+                      "name": "fromAcc",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "toAcc",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "contract IAsset",
+                      "name": "asset",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "subId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "int256",
+                      "name": "amount",
+                      "type": "int256"
+                  },
+                  {
+                      "internalType": "bytes32",
+                      "name": "assetData",
+                      "type": "bytes32"
+                  }
+              ],
+              "internalType": "struct ISubAccounts.AssetTransfer[]",
+              "name": "assetTransfers",
+              "type": "tuple[]"
+          },
+          {
+              "internalType": "bytes",
+              "name": "managerData",
+              "type": "bytes"
+          }
+      ],
+      "name": "submitTransfers",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "tradeId",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "bytes4",
+              "name": "interfaceId",
+              "type": "bytes4"
+          }
+      ],
+      "name": "supportsInterface",
+      "outputs": [
+          {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "symbol",
+      "outputs": [
+          {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+          }
+      ],
+      "name": "tokenURI",
+      "outputs": [
+          {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "from",
+              "type": "address"
+          },
+          {
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+          }
+      ],
+      "name": "transferFrom",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  }
+]

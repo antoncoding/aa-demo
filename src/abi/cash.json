@@ -1,0 +1,990 @@
+[
+  {
+      "inputs": [
+          {
+              "internalType": "contract ISubAccounts",
+              "name": "_subAccounts",
+              "type": "address"
+          },
+          {
+              "internalType": "contract IERC20Metadata",
+              "name": "_wrappedAsset",
+              "type": "address"
+          },
+          {
+              "internalType": "contract IInterestRateModel",
+              "name": "_rateModel",
+              "type": "address"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+  },
+  {
+      "inputs": [],
+      "name": "CA_ForceWithdrawNegativeBalance",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "CA_ForceWithdrawNotAuthorized",
+      "type": "error"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "lastUpdatedAt",
+              "type": "uint256"
+          },
+          {
+              "internalType": "uint256",
+              "name": "currentTimestamp",
+              "type": "uint256"
+          }
+      ],
+      "name": "CA_InterestAccrualStale",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "CA_InvalidSubId",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "CA_NotAccount",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "CA_NotLiquidationModule",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "CA_OnlyAccountOwner",
+      "type": "error"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "fee",
+              "type": "uint256"
+          }
+      ],
+      "name": "CA_SmFeeInvalid",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "CA_UnknownManager",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "CA_WithdrawBlockedByOngoingAuction",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "MW_OnlyAccounts",
+      "type": "error"
+  },
+  {
+      "inputs": [],
+      "name": "MW_UnknownManager",
+      "type": "error"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "depositor",
+              "type": "address"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amountAssetMinted",
+              "type": "uint256"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "wrappedAssetDeposited",
+              "type": "uint256"
+          }
+      ],
+      "name": "Deposit",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "interestAccrued",
+              "type": "uint256"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "borrowIndex",
+              "type": "uint256"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "totalSupply",
+              "type": "uint256"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "totalBorrow",
+              "type": "uint256"
+          }
+      ],
+      "name": "InterestAccrued",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "indexed": false,
+              "internalType": "int256",
+              "name": "preBalance",
+              "type": "int256"
+          },
+          {
+              "indexed": false,
+              "internalType": "int256",
+              "name": "interestAccrued",
+              "type": "int256"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "accountIndex",
+              "type": "uint256"
+          }
+      ],
+      "name": "InterestAccruedOnAccount",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": false,
+              "internalType": "contract IInterestRateModel",
+              "name": "rateModel",
+              "type": "address"
+          }
+      ],
+      "name": "InterestRateModelSet",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": false,
+              "internalType": "address",
+              "name": "liquidationModule",
+              "type": "address"
+          }
+      ],
+      "name": "LiquidationModuleSet",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+          }
+      ],
+      "name": "OwnershipTransferStarted",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+          }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": false,
+              "internalType": "int256",
+              "name": "amountChanged",
+              "type": "int256"
+          },
+          {
+              "indexed": false,
+              "internalType": "int256",
+              "name": "currentSettledCash",
+              "type": "int256"
+          }
+      ],
+      "name": "SettledCashUpdated",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "recipientAcc",
+              "type": "uint256"
+          }
+      ],
+      "name": "SmFeeRecipientSet",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "fee",
+              "type": "uint256"
+          }
+      ],
+      "name": "SmFeeSet",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": false,
+              "internalType": "address",
+              "name": "_manager",
+              "type": "address"
+          },
+          {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "_whitelisted",
+              "type": "bool"
+          }
+      ],
+      "name": "WhitelistManagerSet",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "indexed": true,
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "amountAssetBurn",
+              "type": "uint256"
+          },
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "wrappedAssetWithdrawn",
+              "type": "uint256"
+          }
+      ],
+      "name": "Withdraw",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "exchangeRate",
+              "type": "uint256"
+          }
+      ],
+      "name": "WithdrawFeeDisabled",
+      "type": "event"
+  },
+  {
+      "anonymous": false,
+      "inputs": [
+          {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "exchangeRate",
+              "type": "uint256"
+          }
+      ],
+      "name": "WithdrawFeeEnabled",
+      "type": "event"
+  },
+  {
+      "inputs": [],
+      "name": "acceptOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "name": "accountIdIndex",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "accrueInterest",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "accruedSmFees",
+      "outputs": [
+          {
+              "internalType": "uint128",
+              "name": "",
+              "type": "uint128"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "borrowIndex",
+      "outputs": [
+          {
+              "internalType": "uint96",
+              "name": "",
+              "type": "uint96"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          }
+      ],
+      "name": "calculateBalanceWithInterest",
+      "outputs": [
+          {
+              "internalType": "int256",
+              "name": "balance",
+              "type": "int256"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "recipientAccount",
+              "type": "uint256"
+          },
+          {
+              "internalType": "uint256",
+              "name": "stableAmount",
+              "type": "uint256"
+          }
+      ],
+      "name": "deposit",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+          },
+          {
+              "internalType": "uint256",
+              "name": "stableAmount",
+              "type": "uint256"
+          },
+          {
+              "internalType": "contract IManager",
+              "name": "manager",
+              "type": "address"
+          }
+      ],
+      "name": "depositToNewAccount",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "newAccountId",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "disableWithdrawFee",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          }
+      ],
+      "name": "forceWithdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "getCashToStableExchangeRate",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "components": [
+                  {
+                      "internalType": "uint256",
+                      "name": "acc",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "contract IAsset",
+                      "name": "asset",
+                      "type": "address"
+                  },
+                  {
+                      "internalType": "uint256",
+                      "name": "subId",
+                      "type": "uint256"
+                  },
+                  {
+                      "internalType": "int256",
+                      "name": "amount",
+                      "type": "int256"
+                  },
+                  {
+                      "internalType": "bytes32",
+                      "name": "assetData",
+                      "type": "bytes32"
+                  }
+              ],
+              "internalType": "struct ISubAccounts.AssetAdjustment",
+              "name": "adjustment",
+              "type": "tuple"
+          },
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          },
+          {
+              "internalType": "int256",
+              "name": "preBalance",
+              "type": "int256"
+          },
+          {
+              "internalType": "contract IManager",
+              "name": "manager",
+              "type": "address"
+          },
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "name": "handleAdjustment",
+      "outputs": [
+          {
+              "internalType": "int256",
+              "name": "finalBalance",
+              "type": "int256"
+          },
+          {
+              "internalType": "bool",
+              "name": "needAllowance",
+              "type": "bool"
+          }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          },
+          {
+              "internalType": "contract IManager",
+              "name": "newManager",
+              "type": "address"
+          }
+      ],
+      "name": "handleManagerChange",
+      "outputs": [],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "lastTimestamp",
+      "outputs": [
+          {
+              "internalType": "uint64",
+              "name": "",
+              "type": "uint64"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "liquidationModule",
+      "outputs": [
+          {
+              "internalType": "contract IDutchAuction",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "netSettledCash",
+      "outputs": [
+          {
+              "internalType": "int128",
+              "name": "",
+              "type": "int128"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "pendingOwner",
+      "outputs": [
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "previousSmFeePercentage",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "rateModel",
+      "outputs": [
+          {
+              "internalType": "contract IInterestRateModel",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "contract IInterestRateModel",
+              "name": "_rateModel",
+              "type": "address"
+          }
+      ],
+      "name": "setInterestRateModel",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "contract IDutchAuction",
+              "name": "_liquidationModule",
+              "type": "address"
+          }
+      ],
+      "name": "setLiquidationModule",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "_smFee",
+              "type": "uint256"
+          }
+      ],
+      "name": "setSmFee",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "_smId",
+              "type": "uint256"
+          }
+      ],
+      "name": "setSmFeeRecipient",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "_manager",
+              "type": "address"
+          },
+          {
+              "internalType": "bool",
+              "name": "_whitelisted",
+              "type": "bool"
+          }
+      ],
+      "name": "setWhitelistManager",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "smFeePercentage",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "smId",
+      "outputs": [
+          {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "lossAmountInCash",
+              "type": "uint256"
+          },
+          {
+              "internalType": "uint256",
+              "name": "accountToReceive",
+              "type": "uint256"
+          }
+      ],
+      "name": "socializeLoss",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "subAccounts",
+      "outputs": [
+          {
+              "internalType": "contract ISubAccounts",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "supplyIndex",
+      "outputs": [
+          {
+              "internalType": "uint96",
+              "name": "",
+              "type": "uint96"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "temporaryWithdrawFeeEnabled",
+      "outputs": [
+          {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "totalBorrow",
+      "outputs": [
+          {
+              "internalType": "uint128",
+              "name": "",
+              "type": "uint128"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+          {
+              "internalType": "uint128",
+              "name": "",
+              "type": "uint128"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+          }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "transferSmFees",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "int256",
+              "name": "amountCash",
+              "type": "int256"
+          }
+      ],
+      "name": "updateSettledCash",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "name": "whitelistedManager",
+      "outputs": [
+          {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  },
+  {
+      "inputs": [
+          {
+              "internalType": "uint256",
+              "name": "accountId",
+              "type": "uint256"
+          },
+          {
+              "internalType": "uint256",
+              "name": "stableAmount",
+              "type": "uint256"
+          },
+          {
+              "internalType": "address",
+              "name": "recipient",
+              "type": "address"
+          }
+      ],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+  },
+  {
+      "inputs": [],
+      "name": "wrappedAsset",
+      "outputs": [
+          {
+              "internalType": "contract IERC20Metadata",
+              "name": "",
+              "type": "address"
+          }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+  }
+]
