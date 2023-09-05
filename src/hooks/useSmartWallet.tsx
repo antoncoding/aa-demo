@@ -17,7 +17,6 @@ import {getWalletClient, type WalletClient} from "@wagmi/core"
 import { Chain, RpcTransactionRequest } from "viem";
 import { useAccount, useNetwork } from "wagmi";
 import { config } from "dotenv"
-import { RpcRequest } from "viem/dist/types/utils/rpc";
 
 config()
 
@@ -143,9 +142,9 @@ export function useSmartWallet() {
 
     if (smartAccountAddress === undefined) return
 
+    // todo: replace with a wrapper contract to make sure subAccountIds don't collide
     const nextSubAccountId = await subAccounts.lastAccountId() as BigNumber
-    console.log("nextSubAccountId", nextSubAccountId)
-
+    
     const txs: RpcTransactionRequest[] = []
     // build tx1: register sessionKey
     txs.push({
@@ -207,7 +206,6 @@ export function useSmartWallet() {
 
 
   async function sendERC20(transferAmount: string, sendToBundlerCallback?: Function, txConfirmedCallback?: Function) {
-
     // 1. build erc20 transactions
     const target = addresses.usdc; // usdc address
     const data = usdcContract.interface.encodeFunctionData("transfer(address,uint256)", [
@@ -281,7 +279,6 @@ export function useSmartWallet() {
       })
       .sendTransactions(txs)
 
-    console.log("tx Hash", txHash)
     setTxHash(txHash)
     if (txConfirmedCallback) txConfirmedCallback(txHash)
   }
