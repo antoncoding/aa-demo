@@ -253,5 +253,10 @@ export function useSmartWallet() {
     if (txConfirmedCallback) txConfirmedCallback(txHash)
   }
 
-  return { sendERC20, walletReady, provider, smartAccountAddress, usdcBalance, opHash, txHash, enableTrading }
+  async function refreshUSDCBalance() {
+    const balance = await usdcContract.balanceOf(smartAccountAddress)
+    setUSDCBalance(ethers.utils.formatUnits(balance, 'mwei')); // 6 decimals
+  }
+
+  return { sendERC20, walletReady, provider, smartAccountAddress, usdcBalance, opHash, txHash, enableTrading, refreshUSDCBalance }
 }

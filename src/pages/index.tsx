@@ -1,11 +1,15 @@
 
-import { Button } from '@chakra-ui/react'
+import { Button, Spinner } from '@chakra-ui/react'
+import { RepeatIcon } from '@chakra-ui/icons'
+import Image from 'next/image'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { useSmartWallet } from "../hooks/useSmartWallet"
 import { useToast } from '@chakra-ui/react'
 import { useAccount } from 'wagmi'
+import { useState } from 'react'
+import pepe from '../imgs/pepe.gif'
 
 const Home: NextPage = () => {
 
@@ -13,10 +17,12 @@ const Home: NextPage = () => {
 
   const { address } = useAccount()
 
-  const { sendERC20, walletReady, smartAccountAddress, usdcBalance, txHash, enableTrading } = useSmartWallet()
+  const { sendERC20, walletReady, smartAccountAddress, usdcBalance, txHash, enableTrading, refreshUSDCBalance } = useSmartWallet()
+
+  const [isFaucetLoading, setIsFaucetLoading] = useState(false)
 
   const handleClickSendERC20 = async () => {
-    await sendERC20('5000000',
+    await sendERC20('50000000',
       () => toast({ title: 'Tx Sent To bundler' }),
       () => toast({ title: 'Tx confirmed' }))
   }
@@ -27,15 +33,24 @@ const Home: NextPage = () => {
   }
 
   const handleMintFaucet = async () => {
-    const response = await fetch('/api/faucet', { 
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ recipient: smartAccountAddress })
-    });
-    const data = await response.json();
-    console.log({data})
+    setIsFaucetLoading(true)
+    try {
+      const response = await fetch('/api/faucet', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ recipient: smartAccountAddress })
+      });
+      const data = await response.json();
+      if (data.success) {
+        toast({ title: 'USDC Sent', description: <p className='hex' style={{fontSize: 14, paddingRight: 20}}>{data.hash}</p>})
+      } else {
+        toast({ title: 'Error', description: data.message, status: 'error'})
+      }
+    } catch { } finally {
+      setIsFaucetLoading(false)
+    }
   }
 
   
@@ -50,8 +65,7 @@ const Home: NextPage = () => {
         <h3 className={styles.title} style={{ padding: 20 }}>
           V2 is Coming...
         </h3>
-        
-        <br />
+        <Image width={400} src={pepe} alt="pepe" />
 
         <p className='hex'>
           EOA: {address ? address : 'not connected'}
@@ -59,9 +73,12 @@ const Home: NextPage = () => {
         <p className='hex'>
           SCW: {smartAccountAddress ? smartAccountAddress : address ? 'loading...' : 'not connected'}
         </p>
+        <span style={{display: 'flex'}}>
         <p className='hex'>
-          USDC Balance: {usdcBalance ? usdcBalance : 'loading...'}
+          USDC Balance: {usdcBalance ? usdcBalance : 'loading...'} <RepeatIcon _hover={{color: '#56C3A9E6'}} onClick={() => refreshUSDCBalance()}/>
         </p>
+        
+        </span>
         <Button
             backgroundColor="#56C3A9E6"
             borderRadius="7px"
@@ -76,7 +93,7 @@ const Home: NextPage = () => {
             disabled={!walletReady}
             onClick={() => handleMintFaucet()}
           >
-            <p>Get 1000 USDC</p>
+            {isFaucetLoading ? <Spinner /> : <p>Get 1000 USDC</p>}
           </Button>
 
         <br />
@@ -101,7 +118,7 @@ const Home: NextPage = () => {
             disabled={!walletReady}
             onClick={() => handleClickSendERC20()}
           >
-            <p>Send 5 USDC</p>
+            <p>Send 50 USDC</p>
           </Button>
 
           <Button

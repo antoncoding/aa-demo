@@ -15,6 +15,7 @@
   "dependencies": {
     "@alchemy/aa-core": "^0.1.0-alpha.29",
     "@alchemy/aa-ethers": "^0.1.0-alpha.29",
+    "@chakra-ui/icons": "^2.1.0",
     "@chakra-ui/react": "2.8.0",
     "@heroicons/react": "^1.0.5",
     "@rainbow-me/rainbowkit": "^1.0.10",

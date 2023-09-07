@@ -43,10 +43,10 @@ export default async function handler(
       account,
       to: addresses.usdc,
       data: encodeFunctionData({ abi: usdcAbi, functionName: 'mint', args: [req.body.recipient, amount] }),
-      chain: lyraChain
+      chain: lyraChain,
     })
 
-    res.status(200).json({ hash } as any)
+    res.status(200).json({ success: true, hash } as any)
   } catch (e) {
     return res.status(500).json({ success: false, message: e } as any);
   }
