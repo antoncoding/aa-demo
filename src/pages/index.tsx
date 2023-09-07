@@ -48,9 +48,15 @@ const Home: NextPage = () => {
         <p className='hex'>
           SCW: {smartAccountAddress ? smartAccountAddress : address ? 'loading...' : 'not connected'}
         </p>
-        <p className='hex' style={{ paddingTop: 50 }}>
+        <p className='hex'>
           USDC Balance: {usdcBalance ? usdcBalance : 'loading...'}
         </p>
+
+        <br />
+
+        <h4 className={styles.title} style={{ padding: 20, fontSize: 24 }}>
+          Try our L2 AA Transactions
+        </h4>
 
         <div className={styles.grid}>
 

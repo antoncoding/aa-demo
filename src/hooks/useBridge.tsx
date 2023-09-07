@@ -51,17 +51,30 @@ export function useBridge() {
    * @dev bridge eth to L2
    * @returns 
    */
-  async function bridgeETHTo(l2Address: string, ethAmount: string, txConfirmedCallback?: Function) {
+  async function bridgeETHTo(destination: string, ethAmount: bigint, txConfirmedCallback?: Function, errorCallback?: Function) {
+    try {
+
+    
     if (!walletClient) return
     const hash = await walletClient.writeContract({
       address: addresses.bridge,
       abi: bridgeAbi,
       functionName: 'bridgeETHTo',
-      args: [l2Address, '0', '0x00'],
-      value: hexToBigInt(BigNumber.from(ethAmount).toHexString() as `0x${string}`)
+      args: [destination, '0', '0x00'], // destination, minGasLimit, extraData
+      value: ethAmount
     })
     
     if (txConfirmedCallback) txConfirmedCallback(hash)
+    } catch (e: unknown) {
+  console.log({e})
+      if (errorCallback) {
+        (e as any).message
+          ? errorCallback((e as any).message) 
+          : errorCallback(e)
+      } else {
+        console.error(e)
+      }
+    }
   }
 
 

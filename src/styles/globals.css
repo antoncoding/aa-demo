@@ -21,8 +21,8 @@ p.main {
 p.hex {
   font-size: 15px;
   font-family: Victor Mono, monospace;
-  padding: 20px;
-  padding-bottom: 5px;
+  padding: 10px;
+  padding-bottom: 10px;
 }
 
 * {
