@@ -34,7 +34,7 @@ export default async function handler(
     return res.status(405).end();
   }
 
-  const amount = '10000000000' // 10K USDC
+  const amount = '1000000000' // 1K USDC
 
   if (!req.body.recipient) res.status(400).json({ success: false, message: 'recipient is required' } as any);
 

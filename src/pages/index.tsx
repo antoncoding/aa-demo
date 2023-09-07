@@ -4,7 +4,6 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { useSmartWallet } from "../hooks/useSmartWallet"
-import { useBridge } from "../hooks/useBridge"
 import { useToast } from '@chakra-ui/react'
 import { useAccount } from 'wagmi'
 
@@ -76,13 +75,13 @@ const Home: NextPage = () => {
             disabled={!walletReady}
             onClick={() => handleMintFaucet()}
           >
-            <p>Get Testnet USDC</p>
+            <p>Get 1000 USDC</p>
           </Button>
 
         <br />
 
         <h4 className={styles.title} style={{ padding: 20, fontSize: 24 }}>
-          Try our L2 AA Transactions
+          Try ERC-4337 Gasless Transactions
         </h4>
 
         <div className={styles.grid}>
