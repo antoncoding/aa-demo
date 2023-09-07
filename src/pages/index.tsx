@@ -27,13 +27,25 @@ const Home: NextPage = () => {
     await enableTrading(initDepositAmount, () => toast({ title: 'Tx confirmed' }))
   }
 
+  const handleMintFaucet = async () => {
+    const response = await fetch('/api/faucet', { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ recipient: smartAccountAddress })
+    });
+    const data = await response.json();
+    console.log({data})
+  }
+
   
   return (
     <div className={styles.container}>
       <Head>
         <title>Lyra V2 Alpha</title>
         <meta name="description" content="ETH + Next.js DApp Boilerplate by ilyxium" />
-        <link rel="icon" href="/lyra.ico" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
         <h3 className={styles.title} style={{ padding: 20 }}>
@@ -51,6 +63,21 @@ const Home: NextPage = () => {
         <p className='hex'>
           USDC Balance: {usdcBalance ? usdcBalance : 'loading...'}
         </p>
+        <Button
+            backgroundColor="#50C878"
+            borderRadius="7px"
+            margin={2.5}
+            _hover={{
+              bg: '#121212'
+            }}
+            _active={{
+              bg: '#121212'
+            }}
+            disabled={!walletReady}
+            onClick={() => handleMintFaucet()}
+          >
+            <p>Get Testnet USDC</p>
+          </Button>
 
         <br />
 
