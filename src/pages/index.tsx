@@ -63,8 +63,9 @@ const Home: NextPage = () => {
           USDC Balance: {usdcBalance ? usdcBalance : 'loading...'}
         </p>
         <Button
-            backgroundColor="#50C878"
+            backgroundColor="#56C3A9E6"
             borderRadius="7px"
+            textColor={"white"}
             margin={2.5}
             _hover={{
               bg: '#121212'
@@ -87,8 +88,9 @@ const Home: NextPage = () => {
         <div className={styles.grid}>
 
           <Button
-            backgroundColor="#50C878"
+            backgroundColor="#56C3A9E6"
             borderRadius="7px"
+            textColor={"white"}
             margin={2.5}
             _hover={{
               bg: '#121212'
@@ -103,8 +105,9 @@ const Home: NextPage = () => {
           </Button>
 
           <Button
-            backgroundColor="#50C878"
+            backgroundColor="#56C3A9E6"
             borderRadius="7px"
+            textColor={"white"}
             margin={2.5}
             _hover={{
               bg: '#121212'

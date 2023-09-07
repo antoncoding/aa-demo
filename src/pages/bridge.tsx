@@ -77,8 +77,9 @@ const Home: NextPage = () => {
           <p className='hex'> ETH </p>
           <Button
             // purple
-            backgroundColor="#AFE1AF"
+            backgroundColor="#56C3A9E6"
             borderRadius="7px"
+            textColor={"white"}
             margin={2.5}
             _hover={{
               bg: '#5F8575'
@@ -92,9 +93,9 @@ const Home: NextPage = () => {
             <p> to SCW</p>
           </Button>
           <Button
-            // purple
-            backgroundColor="#AFE1AF"
+            backgroundColor="#56C3A9E6"
             borderRadius="7px"
+            textColor={"white"}
             margin={2.5}
             _hover={{
               bg: '#5F8575'

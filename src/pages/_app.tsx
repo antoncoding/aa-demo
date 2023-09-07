@@ -6,7 +6,7 @@ import type { AppProps } from 'next/app'
 import { ChakraProvider } from '@chakra-ui/react'
 
 import {
-  RainbowKitProvider,
+  RainbowKitProvider, Theme, lightTheme
 } from '@rainbow-me/rainbowkit';
 
 import {
@@ -23,6 +23,7 @@ import { theme } from '../styles/theme'
 import { connectorsForWallets } from '@rainbow-me/rainbowkit'
 import { injectedWallet } from '@rainbow-me/rainbowkit/wallets'
 import { publicProvider } from 'wagmi/providers/public'
+import merge from 'lodash.merge';
 
 
 import {config} from "dotenv"
@@ -37,6 +38,19 @@ const { chains, publicClient } = configureChains(
     publicProvider()
   ]
 );
+
+const myTheme = merge(lightTheme(), {
+  colors: {
+    accentColor: '#56C3A9E6',
+  },
+  radii: {
+    connectButton: '0.3rem',
+    modal: '0.5rem',
+  },
+  fonts: {
+    body: 'Inter, sans-serif'
+  }
+} as Theme);
 
 const wagmiConfig = createConfig({
   autoConnect: true,
@@ -63,7 +77,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   if (typeof window === 'undefined') {
     return <></>;
   } else return (<WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider chains={chains}>
+      <RainbowKitProvider chains={chains} theme={myTheme}>
         <ChakraProvider theme={theme}>
           <Page>
             <Component {...pageProps} />
