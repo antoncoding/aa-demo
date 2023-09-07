@@ -86,6 +86,7 @@ export function useSmartWallet() {
 
   const [smartAccountAddress, setSmartAccountAddress] = useState<string | undefined>(undefined)
   const [usdcBalance, setUSDCBalance] = useState<string | undefined>(undefined)
+  const [ethBalance, setETHBalance] = useState<string | undefined>(undefined)
   
   const [opHash, setOpHash] = useState<string | undefined>(undefined)
   const [txHash, setTxHash] = useState<string | undefined>(undefined)

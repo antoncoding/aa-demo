@@ -15,7 +15,7 @@ import {
   WagmiConfig,
 } from 'wagmi';
 
-import { goerli, mainnet } from 'viem/chains';
+import { sepolia, goerli, mainnet } from 'viem/chains';
 
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { Page } from '../components/Page'
@@ -31,7 +31,7 @@ config()
 const alchemyKey = process.env.NEXT_PUBLIC_ALCHEMY_KEY!;
 
 const { chains, publicClient } = configureChains(
-  [goerli, mainnet],
+  [sepolia, goerli, mainnet],
   [
     alchemyProvider({apiKey: alchemyKey}),
     publicProvider()

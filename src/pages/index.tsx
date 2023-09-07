@@ -3,10 +3,10 @@ import { Button } from '@chakra-ui/react'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import {useSmartWallet} from "../hooks/useSmartWallet"
+import { useSmartWallet } from "../hooks/useSmartWallet"
+import { useBridge } from "../hooks/useBridge"
 import { useToast } from '@chakra-ui/react'
 import { useAccount } from 'wagmi'
-
 
 const Home: NextPage = () => {
 
@@ -16,17 +16,18 @@ const Home: NextPage = () => {
 
   const { sendERC20, walletReady, smartAccountAddress, usdcBalance, txHash, enableTrading } = useSmartWallet()
 
-  const handleClick = async () => {
-    await sendERC20('5000000', 
-    () => toast({title:'Tx Sent To bundler'}), 
-    () => toast({title:'Tx confirmed'}))
+  const handleClickSendERC20 = async () => {
+    await sendERC20('5000000',
+      () => toast({ title: 'Tx Sent To bundler' }),
+      () => toast({ title: 'Tx confirmed' }))
   }
 
   const handleEnableTrading = async () => {
     const initDepositAmount = '100000000';
-    await enableTrading(initDepositAmount, () => toast({title:'Tx confirmed'}))
+    await enableTrading(initDepositAmount, () => toast({ title: 'Tx confirmed' }))
   }
 
+  
   return (
     <div className={styles.container}>
       <Head>
@@ -35,9 +36,11 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <h3 className={styles.title} style={{padding: 20}}>
-          ¡Hola!
+        <h3 className={styles.title} style={{ padding: 20 }}>
+          V2 is Coming...
         </h3>
+        
+        <br />
 
         <p className='hex'>
           EOA: {address ? address : 'not connected'}
@@ -45,43 +48,43 @@ const Home: NextPage = () => {
         <p className='hex'>
           SCW: {smartAccountAddress ? smartAccountAddress : address ? 'loading...' : 'not connected'}
         </p>
-        <p style={{paddingTop: 50}}>
+        <p className='hex' style={{ paddingTop: 50 }}>
           USDC Balance: {usdcBalance ? usdcBalance : 'loading...'}
         </p>
-    
+
         <div className={styles.grid}>
 
           <Button
-              backgroundColor="#32CD32"
-              borderRadius="7px"
-              margin={2.5}
-              _hover={{
-                bg: '#121212'
-              }}
-              _active={{
-                bg: '#121212'
-              }}
-              disabled={!walletReady}
-              onClick={() => handleClick()}
-            >
-              <p>Send 5 USDC</p>
-            </Button>
+            backgroundColor="#50C878"
+            borderRadius="7px"
+            margin={2.5}
+            _hover={{
+              bg: '#121212'
+            }}
+            _active={{
+              bg: '#121212'
+            }}
+            disabled={!walletReady}
+            onClick={() => handleClickSendERC20()}
+          >
+            <p>Send 5 USDC</p>
+          </Button>
 
-            <Button
-              backgroundColor="#32CD32"
-              borderRadius="7px"
-              margin={2.5}
-              _hover={{
-                bg: '#121212'
-              }}
-              _active={{
-                bg: '#121212'
-              }}
-              disabled={!walletReady}
-              onClick={() => handleEnableTrading()}
-            >
-              <p>Enable Trading</p>
-            </Button>
+          <Button
+            backgroundColor="#50C878"
+            borderRadius="7px"
+            margin={2.5}
+            _hover={{
+              bg: '#121212'
+            }}
+            _active={{
+              bg: '#121212'
+            }}
+            disabled={!walletReady}
+            onClick={() => handleEnableTrading()}
+          >
+            <p>Enable Trading</p>
+          </Button>
         </div>
 
         <p className='hex'>

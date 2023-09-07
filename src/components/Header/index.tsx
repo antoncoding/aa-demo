@@ -39,6 +39,7 @@ export const Header = () => {
               mr={4}
             >
             <NavItem key="id-0" href={'/'} text="Home">  </NavItem>
+            <NavItem key="id-1" href={'/bridge'} text="Bridge">  </NavItem>
             </HStack>
 
             {/* Connect Wallet Button */}
