@@ -31,9 +31,9 @@ const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Lyra V2 AA</title>
+        <title>Lyra V2 Alpha</title>
         <meta name="description" content="ETH + Next.js DApp Boilerplate by ilyxium" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/lyra.ico" />
       </Head>
       <main className={styles.main}>
         <h3 className={styles.title} style={{ padding: 20 }}>

@@ -68,9 +68,10 @@ const Home: NextPage = () => {
         <br />
 
         <div className={styles.grid}>
+          <p className='hex'> Bridge </p>
           <Input
             value={depositAmount}
-            width={200}
+            width={100}
             onChange={(event) => setDepositAmount(event.target.value)}>
           </Input>
           <p className='hex'> ETH </p>
