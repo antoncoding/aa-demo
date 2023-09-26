@@ -7,7 +7,7 @@ import {
 } from "@alchemy/aa-ethers";
 
 import { createSplitRpcClient } from "../utils/client";
-import { encodeFunctionData } from 'viem'
+import { encodeFunctionData, toHex } from 'viem'
 
 import {
   SimpleSmartContractAccount,
@@ -203,12 +203,30 @@ export function useSmartWallet() {
     // send to the bundler
     const { hash } = await provider
       .withPaymasterMiddleware({
-        dummyPaymasterDataMiddleware: async () => { return { paymasterAndData: addresses.dumbPaymaster } }, // this is for verification
-        paymasterDataMiddleware: async () => { return { paymasterAndData: addresses.dumbPaymaster } }, // for real tx
+        dummyPaymasterDataMiddleware: async () => { 
+          return { paymasterAndData: addresses.dumbPaymaster } 
+        }, // this is for verification
+        paymasterDataMiddleware: async (uo) => { 
+          const response = await fetch('/api/paymaster', { 
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userOp: {
+              callData: await (uo.callData),
+              sender: await (uo.sender),
+              maxFeePerGas: toHex(uo.maxFeePerGas as bigint),
+            } })
+          });
+          const data = await response.json();
+
+          return { paymasterAndData: data.paymasterData } 
+        }, // for real tx
       })
       .withCustomMiddleware(async (userOps) => {
         return {
           ...userOps,
+          preVerificationGas: BigNumber.from(userOps.preVerificationGas as bigint).mul(2).toString(), // buffer for first time wallet
           verificationGasLimit: BigNumber.from(userOps.verificationGasLimit as bigint).mul(2).toString(), // buffer for first time wallet
         }
       })
@@ -238,8 +256,8 @@ export function useSmartWallet() {
     // send to the bundler
     const txHash = await provider
       .withPaymasterMiddleware({
-        dummyPaymasterDataMiddleware: async () => { return { paymasterAndData: addresses.dumbPaymaster } }, // this is for verification
-        paymasterDataMiddleware: async () => { return { paymasterAndData: addresses.dumbPaymaster } }, // for real tx
+        dummyPaymasterDataMiddleware: async () => { return { paymasterAndData: addresses.signaturePaymaster } }, // this is for verification
+        paymasterDataMiddleware: async () => { return { paymasterAndData: addresses.signaturePaymaster } }, // for real tx
       })
       .withCustomMiddleware(async (userOps) => {
         return {
