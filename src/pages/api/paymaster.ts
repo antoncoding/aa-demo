@@ -46,9 +46,13 @@ export default async function handler(
     const msgHash = keccak256(encodedData)
 
     // slice the 0x
-    const signature = ec.sign(msgHash.slice(2), privKey, "hex", {canonical: true});
-    
-    const finalSig = signature.r.toString('hex') + signature.s.toString('hex') + (signature.recoveryParam + 27).toString(16)
+    const signature = ec.sign(msgHash.slice(2), keyPair, 'hex', { canonical: true })
+
+    let r = signature.r.toString('hex')
+    if (r.length === 63) r = '0' + r
+    let s = signature.s.toString('hex')
+    if (s.length === 63) s = '0' + s
+    const finalSig = r + s + ((signature.recoveryParam as number) + 27).toString(16)
     
     const paymasterData = addresses.signaturePaymaster + finalSig
     
